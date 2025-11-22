@@ -22,6 +22,9 @@
 
 CalendarDiary 是一款跨平台的桌面日历日记应用，采用现代化设计理念，为用户提供简洁直观的记录体验。
 
+<img src="./preview1.png" width="500" />
+
+<img src="./preview2.png" width="500" />
 
 ### ✨ 核心特色
 
@@ -33,7 +36,7 @@ CalendarDiary 是一款跨平台的桌面日历日记应用，采用现代化设
 - **🔄 自动更新** - 内置更新检测，保持软件最新
 - **🌍 多语言支持** - 支持简中、繁中、英语、日语、韩语、俄语
 
-## Stars
+## ⭐️ Stars
 
 <img src="https://api.star-history.com/svg?repos=trustdev-org/calendar-diary&type=Date" width="500" />
 
