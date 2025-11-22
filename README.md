@@ -22,9 +22,19 @@
 
 CalendarDiary 是一款跨平台的桌面日历日记应用，采用现代化设计理念，为用户提供简洁直观的记录体验。
 
-<img src="./preview1.png" width="500" />
+### 软件界面展示
 
-<img src="./preview2.png" width="500" />
+<img src="./img-preview-1.png"/>
+
+<img src="./img-preview-2.png"/>
+
+### 如何写入内容
+
+<img src="./img-how-to-use-1.gif"/>
+
+### 如何切换月份
+
+<img src="./img-how-to-use-2.gif"/>
 
 ### ✨ 核心特色
 
