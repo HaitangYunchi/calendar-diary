@@ -12,7 +12,7 @@
 [![License](https://img.shields.io/badge/license-CC--BY--NC--4.0-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](https://github.com/trustdev-org/calendar-diary/releases)
 
-[📥 下载应用](#-下载安装) • [✨ 功能特性](#-功能特性) • [🚀 快速开始](#-开发指南) • [📖 使用文档](#-使用方法)
+[📥 下载应用](#-下载安装) • [✨ 使用方法](#-使用方法) • [🚀 快速开始](#-开发指南) • [📖 使用文档](#-使用方法)
 
 </div>
 
@@ -151,7 +151,7 @@ sudo dpkg -i calendar-diary_0.1.0-beta_amd64.deb
 ### 环境要求
 
 - **Node.js**: 18.x 或更高版本
-- **pnpm**: 推荐使用 pnpm 作为包管理器
+- **npm**: Node.js 自带的包管理器
 - **操作系统**: Windows 10+, macOS 10.13+, Linux
 
 ### 克隆项目
@@ -164,19 +164,13 @@ cd calendar-diary
 ### 安装依赖
 
 ```bash
-# 使用 pnpm (推荐)
-pnpm install
-
-# 或使用 npm
 npm install
 ```
 
 ### 开发模式
 
-#### 🖥️ Electron 桌面应用开发
-
 ```bash
-pnpm run electron:dev
+npm run dev
 ```
 
 这将：
@@ -184,33 +178,25 @@ pnpm run electron:dev
 2. 自动启动 Electron 应用
 3. 支持热重载（HMR）
 
-#### 🌐 Web 版本开发
-
-```bash
-pnpm run dev
-```
-
-浏览器访问：http://localhost:5173
-
 ### 构建打包
 
 #### 构建所有平台
 
 ```bash
-pnpm run electron:build
+npm run electron:build
 ```
 
 #### 构建特定平台
 
 ```bash
 # macOS
-pnpm run electron:build:mac
+npm run electron:build:mac
 
 # Windows
-pnpm run electron:build:win
+npm run electron:build:win
 
 # Linux
-pnpm run electron:build:linux
+npm run electron:build:linux
 ```
 
 构建产物输出到 `release/` 目录。
@@ -350,61 +336,3 @@ git push origin v0.1.1
 Made with ❤️ by TrustDev
 
 </div>
-
-应用直接调用 Gemini API 进行 AI 功能。后端服务器是可选的，可用于：
-- 集中管理 API 密钥
-- 添加额外的业务逻辑
-- 跨设备同步（未来功能）
-
-## 使用说明
-
-1. **添加事件**: 点击任意日期，在弹出的编辑器中添加事件
-2. **添加贴纸**: 在日期编辑器中选择贴纸装饰你的日历
-3. **生成月度计划**: 点击"Generate Plan"按钮使用 AI 生成建议
-4. **分析月度**: 查看 AI 对你一个月活动的智能分析
-5. **导入/导出**: 通过设置菜单备份和恢复数据
-
-## 快捷键（Electron）
-
-- `Cmd/Ctrl + W`: 关闭窗口
-- `Cmd/Ctrl + M`: 最小化窗口
-- `Cmd/Ctrl + Q`: 退出应用（macOS）
-
-## 故障排除
-
-### Electron 无法启动
-
-确保已安装所有依赖：
-```bash
-npm install
-```
-
-### API 调用失败
-
-检查 `.env` 文件中的 API 密钥配置是否正确。
-
-### 构建失败
-
-清除缓存并重新安装：
-```bash
-rm -rf node_modules dist dist-electron dist-server
-npm install
-```
-
-## 开源信息
-
-- **仓库地址**: [https://github.com/trustdev-org/calendar-diary](https://github.com/trustdev-org/calendar-diary)
-- **许可证**: CC BY-NC 4.0 (Creative Commons Attribution-NonCommercial 4.0)
-- **版权所有**: © 2025 TrustDev
-
-### 许可说明
-
-本项目采用 CC BY-NC 4.0 协议开源：
-- ✅ 允许自由分享和修改
-- ✅ 必须注明原作者
-- ❌ 禁止商业用途
-- 📖 [查看完整协议](https://creativecommons.org/licenses/by-nc/4.0/)
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request！请确保遵守 CC BY-NC 4.0 协议。

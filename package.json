@@ -10,12 +10,11 @@
     "url": "https://github.com/trustdev-org/calendar-diary.git"
   },
   "homepage": "https://github.com/trustdev-org/calendar-diary",
-  "main": "dist-electron/main.cjs",
+  "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build && electron-builder",
     "preview": "vite preview",
-    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "vite build && tsc -p tsconfig.electron.json && mv dist-electron/main.js dist-electron/main.cjs && mv dist-electron/preload.js dist-electron/preload.cjs && electron-builder",
     "electron:build:mac": "vite build && tsc -p tsconfig.electron.json && mv dist-electron/main.js dist-electron/main.cjs && mv dist-electron/preload.js dist-electron/preload.cjs && electron-builder --mac",
     "electron:build:win": "vite build && tsc -p tsconfig.electron.json && mv dist-electron/main.js dist-electron/main.cjs && mv dist-electron/preload.js dist-electron/preload.cjs && electron-builder --win",
@@ -101,11 +100,5 @@
       "createStartMenuShortcut": true,
       "shortcutName": "日历日记"
     }
-  },
-  "pnpm": {
-    "ignoredBuiltDependencies": [
-      "electron",
-      "esbuild"
-    ]
   }
 }

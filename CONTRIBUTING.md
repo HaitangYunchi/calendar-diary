@@ -57,12 +57,12 @@
 
 4. **安装依赖**
    ```bash
-   pnpm install
+   npm install
    ```
 
 5. **开发和测试**
    ```bash
-   pnpm run electron:dev
+   npm run dev
    ```
 
 6. **提交更改**
@@ -174,15 +174,15 @@ calendar-diary/
 
 ```bash
 # 开发模式
-pnpm run electron:dev
+npm run dev
 
 # 构建测试
-pnpm run electron:build
+npm run electron:build
 
 # 测试特定平台
-pnpm run electron:build:mac
-pnpm run electron:build:win
-pnpm run electron:build:linux
+npm run electron:build:mac
+npm run electron:build:win
+npm run electron:build:linux
 ```
 
 ## 社区准则

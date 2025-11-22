@@ -29,6 +29,9 @@ export default defineConfig(({ mode }) => {
                 outDir: 'dist-electron',
                 rollupOptions: {
                   external: ['electron']
+                },
+                define: {
+                  'process.env.NODE_ENV': JSON.stringify(mode)
                 }
               }
             }
