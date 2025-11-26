@@ -7,9 +7,10 @@ import { SettingsModal } from './components/SettingsModal';
 import { AboutModal } from './components/AboutModal';
 import { UpdateNotification } from './components/UpdateNotification';
 import { AuthModal } from './components/AuthModal';
+import { SearchModal } from './components/SearchModal';
 import { DayData, WEEK_DAYS, DayEvent } from './types';
 import { StorageService } from './services/storageService';
-import { Settings, Minus, Square, X, Github } from 'lucide-react';
+import { Settings, Minus, Square, X, Github, Search } from 'lucide-react';
 import { t, getWeekDay } from './utils/i18n';
 
 const App: React.FC = () => {
@@ -22,8 +23,10 @@ const App: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [needsAuth, setNeedsAuth] = useState(false);
+  const [highlightDate, setHighlightDate] = useState<string | null>(null);
 
   // --- Lifecycle ---
   useEffect(() => {
@@ -52,6 +55,20 @@ const App: React.FC = () => {
     
     loadData();
   }, [isAuthenticated]);
+
+  // 快捷键监听
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+F (Windows/Linux) 或 Cmd+F (macOS)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        setShowSearch(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // --- Handlers ---
   const saveData = async (newData: Record<string, DayData>) => {
@@ -172,6 +189,13 @@ const App: React.FC = () => {
         </div>
         <div className="flex items-center gap-2 non-draggable">
            <button 
+             onClick={() => setShowSearch(true)} 
+             className="p-1.5 text-stone-500 hover:bg-stone-200 hover:text-stone-700 rounded-md transition-all"
+             title={`搜索日记 (${navigator.platform.includes('Mac') ? '⌘F' : 'Ctrl+F'})`}
+           >
+             <Search size={16} />
+           </button>
+           <button 
              onClick={() => setShowAbout(true)} 
              className="p-1.5 text-stone-500 hover:bg-stone-200 hover:text-stone-700 rounded-md transition-all"
              title="About"
@@ -236,15 +260,21 @@ const App: React.FC = () => {
 
                 {/* Days Grid */}
                 <div className={`flex-1 grid grid-cols-7 gap-1 ${isSixWeeks ? 'grid-rows-6' : 'grid-rows-5'}`}>
-                    {days.map((day) => (
-                        <DayCell 
-                            key={day.toISOString()} 
-                            day={day} 
-                            currentDate={currentDate}
-                            data={data[format(day, 'yyyy-MM-dd')]}
-                            onClick={() => setSelectedDay(day)}
-                        />
-                    ))}
+                    {days.map((day) => {
+                        const dateKey = format(day, 'yyyy-MM-dd');
+                        const shouldHighlight = highlightDate === dateKey;
+                        
+                        return (
+                          <DayCell 
+                              key={day.toISOString()} 
+                              day={day} 
+                              currentDate={currentDate}
+                              data={data[dateKey]}
+                              onClick={() => setSelectedDay(day)}
+                              highlight={shouldHighlight}
+                          />
+                        );
+                    })}
                 </div>
             </div>
         </div>
@@ -270,6 +300,23 @@ const App: React.FC = () => {
 
       {showAbout && (
         <AboutModal onClose={() => setShowAbout(false)} />
+      )}
+
+      {showSearch && (
+        <SearchModal 
+          onClose={() => setShowSearch(false)}
+          data={data}
+          onSelectDate={(date) => {
+            const dateKey = format(date, 'yyyy-MM-dd');
+            setCurrentDate(date);
+            setHighlightDate(dateKey);
+            
+            // 闪动两次后移除高亮
+            setTimeout(() => {
+              setHighlightDate(null);
+            }, 1000);
+          }}
+        />
       )}
     </div>
   );

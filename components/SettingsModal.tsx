@@ -249,7 +249,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
         <div className="bg-[#ececec] px-4 py-2 border-b border-[#dcdcdc] flex justify-between items-center select-none">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-stone-600">{t('settings')}</span>
-            <span className="text-[10px] text-stone-400 font-mono">v0.1.2-beta</span>
+            <span className="text-[10px] text-stone-400 font-mono">v0.1.3-beta</span>
           </div>
           <button 
             onClick={onClose} 

@@ -10,9 +10,10 @@ interface DayCellProps {
   currentDate: Date;
   data?: DayData;
   onClick: () => void;
+  highlight?: boolean;
 }
 
-export const DayCell: React.FC<DayCellProps> = ({ day, currentDate, data, onClick }) => {
+export const DayCell: React.FC<DayCellProps> = ({ day, currentDate, data, onClick, highlight }) => {
   const [isHovered, setIsHovered] = useState(false);
   
   const isCurrentMonth = isSameMonth(day, currentDate);
@@ -30,8 +31,12 @@ export const DayCell: React.FC<DayCellProps> = ({ day, currentDate, data, onClic
         relative flex flex-col border-r border-b border-stone-200 select-none
         ${!isCurrentMonth ? 'bg-stone-50/50 text-stone-300 cursor-default' : 'bg-white text-stone-800 cursor-pointer hover:bg-stone-50'}
         ${isToday ? 'ring-2 ring-inset ring-yellow-200 bg-yellow-50/30' : ''}
+        ${highlight ? 'ring-4 ring-blue-400 bg-blue-50 animate-pulse' : ''}
         transition-all duration-200 group overflow-hidden h-full min-h-0
       `}
+      style={{
+        animation: highlight ? 'pulse 0.5s ease-in-out 2' : undefined
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={isCurrentMonth ? onClick : undefined}

@@ -1,5 +1,6 @@
 import { 
   format, 
+  parse,
   startOfMonth, 
   endOfMonth, 
   startOfWeek, 
@@ -197,6 +198,7 @@ export const getHoliday = (date: Date, language: string): string | null => {
 
 export { 
   format, 
+  parse,
   addMonths, 
   subMonths, 
   isSameMonth, 
