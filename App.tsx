@@ -6,6 +6,7 @@ import { DayEditor } from './components/DayEditor';
 import { SettingsModal } from './components/SettingsModal';
 import { AboutModal } from './components/AboutModal';
 import { UpdateNotification } from './components/UpdateNotification';
+import { AuthModal } from './components/AuthModal';
 import { DayData, WEEK_DAYS, DayEvent } from './types';
 import { StorageService } from './services/storageService';
 import { Settings, Minus, Square, X, Github } from 'lucide-react';
@@ -21,9 +22,26 @@ const App: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [needsAuth, setNeedsAuth] = useState(false);
 
   // --- Lifecycle ---
   useEffect(() => {
+    // 检查是否需要验证
+    const securitySettings = localStorage.getItem('calendar-diary-security');
+    if (securitySettings) {
+      const security = JSON.parse(securitySettings);
+      if (security.enabled) {
+        setNeedsAuth(true);
+        return;
+      }
+    }
+    setIsAuthenticated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
     const loadData = async () => {
       const savedData = await StorageService.getData();
       const savedPlans = await StorageService.getPlans();
@@ -33,7 +51,7 @@ const App: React.FC = () => {
     };
     
     loadData();
-  }, []);
+  }, [isAuthenticated]);
 
   // --- Handlers ---
   const saveData = async (newData: Record<string, DayData>) => {
@@ -108,8 +126,40 @@ const App: React.FC = () => {
   // Determine if we need 6 rows
   const isSixWeeks = days.length > 35;
 
+  // 获取安全设置
+  const getSecuritySettings = () => {
+    const securitySettings = localStorage.getItem('calendar-diary-security');
+    if (securitySettings) {
+      return JSON.parse(securitySettings);
+    }
+    return null;
+  };
+
   return (
     <div className="w-full h-full bg-white flex flex-col overflow-hidden relative">
+      
+      {/* Authentication Modal */}
+      {needsAuth && !isAuthenticated && (() => {
+        const security = getSecuritySettings();
+        return security ? (
+          <AuthModal
+            onSuccess={() => {
+              setIsAuthenticated(true);
+              setNeedsAuth(false);
+            }}
+            onClose={() => {
+              if (window.electronAPI?.window?.close) {
+                window.electronAPI.window.close();
+              } else {
+                window.close();
+              }
+            }}
+            defaultMethod={security.preferredMethod || security.type}
+            storedPin={security.pinCode}
+            totpSecret={security.totpSecret}
+          />
+        ) : null;
+      })()}
       
       {/* Update Notification */}
       <UpdateNotification />
