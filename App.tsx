@@ -3,6 +3,7 @@ import { format, addMonths, subMonths, getCalendarDays } from './utils/dateUtils
 import { CalendarHeader } from './components/CalendarHeader';
 import { DayCell } from './components/DayCell';
 import { DayEditor } from './components/DayEditor';
+import { DayPreview } from './components/DayPreview';
 import { SettingsModal } from './components/SettingsModal';
 import { AboutModal } from './components/AboutModal';
 import { UpdateNotification } from './components/UpdateNotification';
@@ -27,6 +28,7 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [needsAuth, setNeedsAuth] = useState(false);
   const [highlightDate, setHighlightDate] = useState<string | null>(null);
+  const [previewWindows, setPreviewWindows] = useState<{ id: string; date: Date }[]>([]);
 
   // --- Lifecycle ---
   useEffect(() => {
@@ -100,6 +102,19 @@ const App: React.FC = () => {
       ...monthlyPlans,
       [monthKey]: newPlan
     });
+  };
+
+  const openPreview = (day: Date) => {
+    const id = format(day, 'yyyy-MM-dd');
+    setPreviewWindows((prev) => {
+      const exists = prev.some(p => p.id === id);
+      if (exists) return prev;
+      return [...prev, { id, date: day }];
+    });
+  };
+
+  const closePreview = (id: string) => {
+    setPreviewWindows(prev => prev.filter(p => p.id !== id));
   };
 
   const handleExport = () => {
@@ -192,7 +207,7 @@ const App: React.FC = () => {
            <button 
              onClick={() => setShowSearch(true)} 
              className="p-1.5 text-stone-500 hover:bg-stone-200 hover:text-stone-700 rounded-md transition-all"
-             title={`搜索日记 (${navigator.platform.includes('Mac') ? '⌘F' : 'Ctrl+F'})`}
+             title={`${t('searchDiary')} (${navigator.platform.includes('Mac') ? '⌘F' : 'Ctrl+F'})`}
            >
              <Search size={16} />
            </button>
@@ -273,6 +288,7 @@ const App: React.FC = () => {
                               data={data[dateKey]}
                               onClick={() => setSelectedDay(day)}
                               highlight={shouldHighlight}
+                              onContextMenu={openPreview}
                             />
                         );
                     })}
@@ -318,6 +334,27 @@ const App: React.FC = () => {
             }, 1000);
           }}
         />
+      )}
+
+      {/* Preview Overlay */}
+      {previewWindows.length > 0 && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)' }}
+        >
+          <div className="max-h-[85vh] overflow-y-auto overflow-x-hidden p-6">
+            <div className="flex flex-wrap gap-6 justify-center">
+              {previewWindows.map((p) => (
+                <DayPreview
+                  key={p.id}
+                  date={p.date}
+                  data={data[format(p.date, 'yyyy-MM-dd')]}
+                  onClose={() => closePreview(p.id)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

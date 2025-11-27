@@ -183,6 +183,11 @@ ipcMain.handle('shell:openExternal', async (_event: any, url: string) => {
   }
 });
 
+// App version
+ipcMain.handle('app:getVersion', () => {
+  return app.getVersion();
+});
+
 // Auto-updater events
 autoUpdater.on('checking-for-update', () => {
   console.log('Checking for updates...');

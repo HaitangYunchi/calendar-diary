@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     checkForUpdates: () => ipcRenderer.invoke('app:checkForUpdates'),
     downloadUpdate: () => ipcRenderer.invoke('app:downloadUpdate'),
     installUpdate: () => ipcRenderer.invoke('app:installUpdate'),
+    getVersion: () => ipcRenderer.invoke('app:getVersion'),
     onUpdateAvailable: (callback: (info: any) => void) => {
       ipcRenderer.on('update-available', (_event, info) => callback(info));
     },
@@ -66,14 +67,15 @@ export interface ElectronAPI {
     openExternal: (url: string) => Promise<void>;
   };
   app: {
-    checkForUpdates: () => Promise<{ success: boolean; updateInfo?: any; error?: string }>;
-    downloadUpdate: () => Promise<{ success: boolean; error?: string }>;
-    installUpdate: () => Promise<void>;
-    onUpdateAvailable: (callback: (info: any) => void) => void;
-    onDownloadProgress: (callback: (progress: any) => void) => void;
-    onUpdateDownloaded: (callback: (info: any) => void) => void;
-    onUpdateError: (callback: (error: any) => void) => void;
-  };
+    checkForUpdates: () => Promise<{ success: boolean; updateInfo?: any; error?: string }>; 
+    downloadUpdate: () => Promise<{ success: boolean; error?: string }>; 
+    installUpdate: () => Promise<void>; 
+    getVersion: () => Promise<string>; 
+    onUpdateAvailable: (callback: (info: any) => void) => void; 
+    onDownloadProgress: (callback: (progress: any) => void) => void; 
+    onUpdateDownloaded: (callback: (info: any) => void) => void; 
+    onUpdateError: (callback: (error: any) => void) => void; 
+  }; 
   platform: string;
 }
 

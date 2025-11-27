@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Search } from 'lucide-react';
+import { t } from '../utils/i18n';
 import { format, parse } from '../utils/dateUtils';
 import { DayData } from '../types';
 
@@ -115,7 +116,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, data, onSelec
         <div className="bg-[#ececec] px-4 py-2 border-b border-[#dcdcdc] flex justify-between items-center select-none">
           <div className="flex items-center gap-2">
             <Search size={14} className="text-stone-600" />
-            <span className="text-xs font-bold text-stone-600">搜索日记</span>
+            <span className="text-xs font-bold text-stone-600">{t('searchDiary')}</span>
             <span className="text-[10px] text-stone-400">
               {navigator.platform.includes('Mac') ? '⌘F' : 'Ctrl+F'}
             </span>
@@ -139,7 +140,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, data, onSelec
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="输入关键词搜索日记内容..."
+              placeholder={t('searchPlaceholder')}
               className="w-full pl-10 pr-4 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-400 text-sm"
             />
           </div>
@@ -150,16 +151,16 @@ export const SearchModal: React.FC<SearchModalProps> = ({ onClose, data, onSelec
           {!searchQuery.trim() ? (
             <div className="flex flex-col items-center justify-center h-full text-stone-400">
               <Search size={48} className="mb-2 opacity-50" />
-              <p className="text-sm">输入关键词开始搜索</p>
+              <p className="text-sm">{t('searchStart')}</p>
             </div>
           ) : results.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-stone-400">
-              <p className="text-sm">未找到包含 "{searchQuery}" 的日记</p>
+              <p className="text-sm">{t('searchNoResults').replace('{query}', searchQuery)}</p>
             </div>
           ) : (
             <div className="space-y-2">
               <p className="text-xs text-stone-500 mb-3">
-                找到 {results.length} 条结果
+                {t('searchResultsCount').replace('{count}', String(results.length))}
               </p>
               {results.map((result) => (
                 <button
