@@ -4,6 +4,7 @@ import { X, Folder, Download, Upload, HardDrive, Globe, Lock, KeyRound, Smartpho
 import { t, setLanguage, getCurrentLanguage, languageNames, type Language } from '../utils/i18n';
 import * as OTPAuth from 'otpauth';
 import QRCode from 'qrcode';
+import { getAppVersion } from '../utils/version';
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -20,6 +21,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(getCurrentLanguage());
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('general');
+  const [appVersion, setAppVersion] = useState<string>('');
   
   
   // Security settings
@@ -98,6 +100,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
 
   useEffect(() => {
     setIsVisible(true);
+    (async () => {
+      const v = await getAppVersion();
+      setAppVersion(v);
+    })();
     const checkElectron = async () => {
       if (window.electronAPI) {
         setIsElectron(true);
@@ -164,11 +170,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
       // 验证 PIN（如果正在编辑）
       if (!savedPin || (pinCode !== '' && confirmPin !== '')) {
         if (pinCode.length > 0 && pinCode.length < 4) {
-          setPinError('PIN 码至少需要 4 位数字');
+          setPinError(t('pinTooShort'));
           return;
         }
         if (pinCode !== confirmPin) {
-          setPinError('两次输入的 PIN 码不一致');
+          setPinError(t('pinMismatch'));
           return;
         }
       }
@@ -177,13 +183,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
     if (securityEnabled && securityType === 'totp') {
       // 验证 TOTP（如果是新配置）
       if (totpSecret && !isTotpVerified) {
-        setPinError('请点击"验证"按钮确认验证码');
+        setPinError(t('totpClickVerify'));
         return;
       }
       
       // 确保有 TOTP 配置（如果当前没有生成密钥，就不检查）
       if (!totpSecret) {
-        setPinError('请先生成验证器密钥');
+        setPinError(t('totpMissingSecret'));
         return;
       }
     }
@@ -194,7 +200,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
       const hasTotp = totpSecret && isTotpVerified;
       
       if (!hasPin && !hasTotp) {
-        setPinError('请至少配置一种验证方式，如果无需验证请关闭上方开关再保存');
+        setPinError(t('securityAtLeastOne'));
         return;
       }
     }
@@ -253,7 +259,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
         <div className="bg-[#ececec] px-4 py-2 border-b border-[#dcdcdc] flex justify-between items-center select-none">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-stone-600">{t('settings')}</span>
-            <span className="text-[10px] text-stone-400 font-mono">v0.1.4-beta</span>
+            <span className="text-[10px] text-stone-400 font-mono">{appVersion ? `v${appVersion}` : ''}</span>
           </div>
           <button 
             onClick={onClose} 
@@ -275,7 +281,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
             }`}
           >
             <Globe size={16} />
-            常规设置
+            {t('generalSettings')}
           </button>
           <button
             onClick={() => setActiveTab('security')}
@@ -286,7 +292,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
             }`}
           >
             <Lock size={16} />
-            安全与隐私
+            {t('securityPrivacy')}
           </button>
         </div>
 
@@ -371,13 +377,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
             {/* Security Section */}
             <section>
                 <h3 className="text-sm font-bold text-stone-700 mb-3 flex items-center gap-2">
-                    <Lock size={16} /> 启动密码保护
+                    <Lock size={16} /> {t('securityEnableTitle')}
                 </h3>
                 <div className="bg-stone-50 p-4 rounded-md border border-stone-200 space-y-4">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-stone-700">启用密码保护</p>
-                            <p className="text-xs text-stone-500 mt-0.5">应用启动时需要验证身份</p>
+                            <p className="text-sm font-medium text-stone-700">{t('securityEnableLabel')}</p>
+                            <p className="text-xs text-stone-500 mt-0.5">{t('securityEnableDesc')}</p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer">
                             <input
@@ -385,7 +391,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                 checked={securityEnabled}
                                 onChange={(e) => setSecurityEnabled(e.target.checked)}
                                 className="sr-only peer"
-                                aria-label="启用密码保护"
+                                aria-label={t('securityEnableLabel')}
                             />
                             <div className="w-11 h-6 bg-stone-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-stone-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-800"></div>
                         </label>
@@ -394,7 +400,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                     {securityEnabled && (
                         <>
                         <div className="pt-4 border-t border-stone-200 space-y-3">
-                            <p className="text-xs font-medium text-stone-600">配置验证方式：</p>
+                            <p className="text-xs font-medium text-stone-600">{t('securityMethodConfig')}</p>
                             <div className="grid grid-cols-2 gap-3">
                                 <button
                                     onClick={() => setSecurityType('pin')}
@@ -410,9 +416,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                         </div>
                                     )}
                                     <KeyRound size={24} className={securityType === 'pin' ? 'text-stone-800' : 'text-stone-500'} />
-                                    <span className="text-sm font-medium">PIN 码</span>
+                                    <span className="text-sm font-medium">{t('pinMethod')}</span>
                                     <span className="text-xs text-stone-500 text-center">
-                                        {savedPin ? '已设置' : '未设置'}
+                                        {savedPin ? t('pinStatusSet') : t('pinStatusNotSet')}
                                     </span>
                                 </button>
                                 <button
@@ -434,9 +440,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                         </div>
                                     )}
                                     <Smartphone size={24} className={securityType === 'totp' ? 'text-stone-800' : 'text-stone-500'} />
-                                    <span className="text-sm font-medium">验证器</span>
+                                    <span className="text-sm font-medium">{t('totpMethod')}</span>
                                     <span className="text-xs text-stone-500 text-center">
-                                        {savedTotp ? '已设置' : '未设置'}
+                                        {savedTotp ? t('pinStatusSet') : t('pinStatusNotSet')}
                                     </span>
                                 </button>
                             </div>
@@ -448,7 +454,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                     <div className="bg-green-50 border border-green-200 rounded-md p-3">
                                         <div className="flex items-center gap-2 mb-2">
                                             <Check size={16} className="text-green-600" />
-                                            <p className="text-sm font-medium text-green-700">PIN 码已设置</p>
+                                            <p className="text-sm font-medium text-green-700">{t('pinSetSuccess')}</p>
                                         </div>
                                         <button
                                             onClick={() => {
@@ -458,13 +464,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                             }}
                                             className="text-xs text-red-600 hover:text-red-700 underline"
                                         >
-                                            取消 PIN 码
+                                            {t('pinCancel')}
                                         </button>
                                     </div>
                                 ) : (
                                     <>
                                         <div>
-                                            <label className="block text-xs font-medium text-stone-600 mb-1.5">{savedPin ? '修改' : '设置'} PIN 码</label>
+                                            <label className="block text-xs font-medium text-stone-600 mb-1.5">{savedPin ? t('pinLabelEdit') : t('pinLabelSet')}</label>
                                             <input
                                                 type="password"
                                                 inputMode="numeric"
@@ -475,12 +481,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                                     setPinCode(value);
                                                     setPinError('');
                                                 }}
-                                                placeholder="输入 4-8 位数字"
+                                                placeholder={t('pinPlaceholder')}
                                                 className="w-full px-3 py-2 border border-stone-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-stone-400"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-xs font-medium text-stone-600 mb-1.5">确认 PIN 码</label>
+                                            <label className="block text-xs font-medium text-stone-600 mb-1.5">{t('pinConfirmLabel')}</label>
                                             <input
                                                 type="password"
                                                 inputMode="numeric"
@@ -491,7 +497,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                                     setConfirmPin(value);
                                                     setPinError('');
                                                 }}
-                                                placeholder="再次输入 PIN 码"
+                                                placeholder={t('pinConfirmPlaceholder')}
                                                 className="w-full px-3 py-2 border border-stone-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-stone-400"
                                             />
                                         </div>
@@ -511,9 +517,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                     <div className="bg-green-50 border border-green-200 rounded-md p-3">
                                         <div className="flex items-center gap-2 mb-2">
                                             <Check size={16} className="text-green-600" />
-                                            <p className="text-sm font-medium text-green-700">验证器已配置</p>
+                                            <p className="text-sm font-medium text-green-700">{t('totpConfigured')}</p>
                                         </div>
-                                        <p className="text-xs text-stone-500 mb-3">您的验证器应用已绑定此账户</p>
+                                        <p className="text-xs text-stone-500 mb-3">{t('totpConfiguredDesc')}</p>
                                         <button
                                             onClick={() => {
                                                 setTotpSecret('');
@@ -524,7 +530,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                             }}
                                             className="text-xs text-red-600 hover:text-red-700 underline"
                                         >
-                                            取消验证器
+                                            {t('totpCancel')}
                                         </button>
                                     </div>
                                 ) : !totpSecret ? (
@@ -533,28 +539,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                             onClick={generateTOTPSecret}
                                             className="w-full py-2 px-4 bg-stone-800 text-white rounded-md hover:bg-stone-900 transition-colors text-sm font-medium"
                                         >
-                                            生成验证器密钥
+                                            {t('totpGenerateSecret')}
                                         </button>
                                         {!savedPin && (
                                             <p className="text-xs text-amber-600 flex items-center gap-1 mt-2">
-                                                <span>💡</span> 请至少配置一种验证方式，如果无需验证请关闭上方开关再保存
+                                                <span>💡</span> {t('securityAtLeastOne')}
                                             </p>
                                         )}
                                     </>
                                 ) : (
                                     <>
                                         <div className="text-center">
-                                            <p className="text-xs font-medium text-stone-600 mb-2">扫描二维码</p>
+                                            <p className="text-xs font-medium text-stone-600 mb-2">{t('totpScanQr')}</p>
                                             {qrCodeUrl && (
                                                 <div className="inline-block p-3 bg-white rounded-lg border-2 border-stone-200">
                                                     <img src={qrCodeUrl} alt="TOTP QR Code" className="w-48 h-48" />
                                                 </div>
                                             )}
-                                            <p className="text-xs text-stone-500 mt-2">使用 Google Authenticator、Microsoft Authenticator 或其他验证器应用扫描</p>
+                                            <p className="text-xs text-stone-500 mt-2">{t('totpScanDesc')}</p>
                                         </div>
 
                                         <div className="bg-stone-50 p-3 rounded-md border border-stone-200">
-                                            <p className="text-xs font-medium text-stone-600 mb-1">手动输入密钥：</p>
+                                            <p className="text-xs font-medium text-stone-600 mb-1">{t('totpManualInput')}</p>
                                             <div className="flex items-center gap-2">
                                                 <code className="flex-1 text-xs bg-white px-2 py-1.5 rounded border border-stone-300 font-mono break-all">
                                                     {totpSecret}
@@ -562,7 +568,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                                 <button
                                                     onClick={copyToClipboard}
                                                     className="p-1.5 hover:bg-stone-200 rounded transition-colors"
-                                                    title="复制密钥"
+                                                    title={t('totpCopySecret')}
                                                 >
                                                     {secretCopied ? (
                                                         <Check size={16} className="text-green-600" />
@@ -574,7 +580,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                         </div>
 
                                         <div>
-                                            <label className="block text-xs font-medium text-stone-600 mb-1.5">输入验证码以确认</label>
+                                            <label className="block text-xs font-medium text-stone-600 mb-1.5">{t('totpEnterCodeConfirm')}</label>
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="text"
@@ -586,7 +592,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                                         setVerifyCode(value);
                                                         setPinError('');
                                                     }}
-                                                    placeholder="输入 6 位验证码"
+                                                    placeholder={t('totpCodePlaceholder')}
                                                     className="flex-1 px-3 py-2 border border-stone-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-stone-400 text-center tracking-wider font-mono"
                                                 />
                                                 <button
@@ -605,11 +611,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                                     {isTotpVerified ? (
                                                         <Check size={16} />
                                                     ) : (
-                                                        '验证'
+                                                        t('totpVerifyButton')
                                                     )}
                                                 </button>
                                             </div>
-                                            <p className="text-xs text-stone-500 mt-1">从验证器应用中获取当前验证码</p>
+                                            <p className="text-xs text-stone-500 mt-1">{t('totpGetCodeHint')}</p>
                                         </div>
 
                                         {pinError && (
@@ -620,7 +626,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onExport,
                                         
                                         {isTotpVerified && !pinError && (
                                             <p className="text-xs text-green-600 flex items-center gap-1">
-                                                <Check size={14} /> 验证码已通过，可以保存
+                                                <Check size={14} /> {t('totpVerifiedSaveReady')}
                                             </p>
                                         )}
                                     </>

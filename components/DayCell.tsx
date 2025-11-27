@@ -4,7 +4,7 @@ import { format, getDate, isSameMonth, isSameDay, getLunarDate, getHoliday } fro
 import { DayData } from '../types';
 
 import { StickerPicker } from './StickerPicker';
-import { getCurrentLanguage } from '../utils/i18n';
+import { getCurrentLanguage, t } from '../utils/i18n';
 
 interface DayCellProps {
   day: Date;
@@ -12,9 +12,10 @@ interface DayCellProps {
   data?: DayData;
   onClick: () => void;
   highlight?: boolean;
+  onContextMenu?: (day: Date) => void;
 }
 
-export const DayCell: React.FC<DayCellProps> = ({ day, currentDate, data, onClick, highlight }) => {
+export const DayCell: React.FC<DayCellProps> = ({ day, currentDate, data, onClick, highlight, onContextMenu }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [maxEllipsisCount, setMaxEllipsisCount] = useState(3);
   const eventsListRef = useRef<HTMLDivElement>(null);
@@ -63,6 +64,13 @@ export const DayCell: React.FC<DayCellProps> = ({ day, currentDate, data, onClic
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={isCurrentMonth ? onClick : undefined}
+      onContextMenu={(e) => {
+        if (!isCurrentMonth) return;
+        e.preventDefault();
+        if (onContextMenu) {
+          onContextMenu(day);
+        }
+      }}
     >
       {/* Date Header */}
       <div className="flex justify-between items-start p-1.5 shrink-0 relative">
@@ -83,7 +91,9 @@ export const DayCell: React.FC<DayCellProps> = ({ day, currentDate, data, onClic
               </div>
               <div className="flex-1"></div>
               {events.length > maxEllipsisCount && (
-                <span className="text-[8px] text-stone-400 whitespace-nowrap shrink-0">共{events.length}条记录</span>
+                <span className="text-[8px] text-stone-400 whitespace-nowrap shrink-0">
+                  {t('entriesCount').replace('{count}', String(events.length))}
+                </span>
               )}
             </div>
         </div>

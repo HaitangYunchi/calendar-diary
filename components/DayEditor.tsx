@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { format } from '../utils/dateUtils';
+import { format, getLunarFullDate } from '../utils/dateUtils';
 import { DayData, DayEvent, STICKERS } from '../types';
 import { X, Plus, Trash2, Save } from 'lucide-react';
 import { t } from '../utils/i18n';
@@ -105,7 +105,7 @@ export const DayEditor: React.FC<DayEditorProps> = ({ date, initialData, onClose
         <div className="bg-stone-100 px-4 py-3 border-b border-stone-200 flex justify-between items-center">
           <div>
              <h2 className="font-serif font-bold text-xl text-ink-black">{format(date, 'yyyy/MM/dd')}</h2>
-             <p className="text-xs text-stone-500 uppercase tracking-wide">{t('dailyEditor')}</p>
+             <p className="text-xs text-stone-500 uppercase tracking-wide">{getLunarFullDate(date)}</p>
           </div>
           <button onClick={onClose} className="text-stone-400 hover:text-stone-600 transition-colors" title="Close">
             <X size={20} />

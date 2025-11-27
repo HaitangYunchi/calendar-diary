@@ -185,6 +185,18 @@ export const getLunarDate = (date: Date): string => {
   return lunarDay;
 };
 
+export const getLunarFullDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const solar = Solar.fromYmd(year, month, day);
+  const lunar = solar.getLunar();
+  const gzYear = lunar.getYearInGanZhi();
+  const cnMonth = lunar.getMonthInChinese();
+  const cnDay = lunar.getDayInChinese();
+  return `${gzYear}年${cnMonth}月${cnDay}`;
+};
+
 // 获取公历节假日
 export const getHoliday = (date: Date, language: string): string | null => {
   const month = date.getMonth() + 1;

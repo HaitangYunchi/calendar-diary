@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Github, Calendar } from 'lucide-react';
 import { t } from '../utils/i18n';
+import { getAppVersion } from '../utils/version';
 
 interface AboutModalProps {
   onClose: () => void;
@@ -8,9 +9,14 @@ interface AboutModalProps {
 
 export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
   const [isVisible, setIsVisible] = React.useState(false);
+  const [appVersion, setAppVersion] = React.useState<string>('');
 
   React.useEffect(() => {
     setIsVisible(true);
+    (async () => {
+      const v = await getAppVersion();
+      setAppVersion(v);
+    })();
   }, []);
 
   const handleGithubClick = async () => {
@@ -53,7 +59,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
             </div>
             <div>
               <h2 className="font-bold text-lg text-stone-800">{t('appTitle')}</h2>
-              <p className="text-xs text-stone-500">v0.1.0-beta</p>
+              <p className="text-xs text-stone-500">{appVersion ? `v${appVersion}` : ''}</p>
             </div>
           </div>
           <button 
@@ -79,7 +85,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
           <div className="bg-stone-50 rounded-lg p-4 space-y-2">
             <div className="flex justify-between text-xs">
               <span className="text-stone-500">{t('version')}</span>
-              <span className="font-mono text-stone-700">0.1.0-beta</span>
+              <span className="font-mono text-stone-700">{appVersion || ''}</span>
             </div>
             <div className="flex justify-between text-xs">
               <span className="text-stone-500">{t('platform')}</span>
