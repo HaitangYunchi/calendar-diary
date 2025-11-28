@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { format, addMonths, subMonths, getCalendarDays } from './utils/dateUtils';
 import { CalendarHeader } from './components/CalendarHeader';
 import { DayCell } from './components/DayCell';
 import { DayEditor } from './components/DayEditor';
 import { DayPreview } from './components/DayPreview';
-import { SettingsModal } from './components/SettingsModal';
-import { AboutModal } from './components/AboutModal';
-import { UpdateNotification } from './components/UpdateNotification';
-import { AuthModal } from './components/AuthModal';
-import { SearchModal } from './components/SearchModal';
+const SettingsModal = React.lazy(() => import('./components/SettingsModal').then(m => ({ default: m.SettingsModal })));
+const AboutModal = React.lazy(() => import('./components/AboutModal').then(m => ({ default: m.AboutModal })));
+const UpdateNotification = React.lazy(() => import('./components/UpdateNotification').then(m => ({ default: m.UpdateNotification })));
+const AuthModal = React.lazy(() => import('./components/AuthModal').then(m => ({ default: m.AuthModal })));
+const SearchModal = React.lazy(() => import('./components/SearchModal').then(m => ({ default: m.SearchModal })));
 import { DayData, WEEK_DAYS, DayEvent } from './types';
 import { StorageService } from './services/storageService';
 import { Settings, Minus, Square, X, Github, Search } from 'lucide-react';
@@ -175,7 +175,8 @@ const App: React.FC = () => {
       {needsAuth && !isAuthenticated && (() => {
         const security = getSecuritySettings();
         return security ? (
-          <AuthModal
+          <Suspense fallback={null}>
+            <AuthModal
             onSuccess={() => {
               setIsAuthenticated(true);
               setNeedsAuth(false);
@@ -190,12 +191,15 @@ const App: React.FC = () => {
             defaultMethod={security.preferredMethod || security.type}
             storedPin={security.pinCode}
             totpSecret={security.totpSecret}
-          />
+            />
+          </Suspense>
         ) : null;
       })()}
       
       {/* Update Notification */}
-      <UpdateNotification />
+      <Suspense fallback={null}>
+        <UpdateNotification />
+      </Suspense>
       
       {/* Custom Title Bar */}
       <div className="h-10 bg-gradient-to-b from-stone-50 to-stone-100 flex justify-between items-center px-4 border-b border-stone-300 select-none shrink-0 draggable">
@@ -308,32 +312,38 @@ const App: React.FC = () => {
       )}
 
       {showSettings && (
-        <SettingsModal 
-            onClose={() => setShowSettings(false)} 
-            onExport={handleExport}
-            onImport={handleImport}
-        />
+        <Suspense fallback={null}>
+          <SettingsModal 
+              onClose={() => setShowSettings(false)} 
+              onExport={handleExport}
+              onImport={handleImport}
+          />
+        </Suspense>
       )}
 
       {showAbout && (
-        <AboutModal onClose={() => setShowAbout(false)} />
+        <Suspense fallback={null}>
+          <AboutModal onClose={() => setShowAbout(false)} />
+        </Suspense>
       )}
 
       {showSearch && (
-        <SearchModal 
-          onClose={() => setShowSearch(false)}
-          data={data}
-          onSelectDate={(date) => {
-            const dateKey = format(date, 'yyyy-MM-dd');
-            setCurrentDate(date);
-            setHighlightDate(dateKey);
-            
-            // 闪动两次后移除高亮
-            setTimeout(() => {
-              setHighlightDate(null);
-            }, 1000);
-          }}
-        />
+        <Suspense fallback={null}>
+          <SearchModal 
+            onClose={() => setShowSearch(false)}
+            data={data}
+            onSelectDate={(date) => {
+              const dateKey = format(date, 'yyyy-MM-dd');
+              setCurrentDate(date);
+              setHighlightDate(dateKey);
+              
+              // 闪动两次后移除高亮
+              setTimeout(() => {
+                setHighlightDate(null);
+              }, 1000);
+            }}
+          />
+        </Suspense>
       )}
 
       {/* Preview Overlay */}
